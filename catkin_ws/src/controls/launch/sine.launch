@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="controls" type="sine_control.py" name="sine_control" respawn="false" output="screen">
+    </node>
+</launch>
