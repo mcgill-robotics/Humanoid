@@ -14,10 +14,12 @@ def generate_sine_wave(time):
 def publish_joint_angles():
     setpoint_publisher = rospy.Publisher('/servosCommand', ServoCommand, queue_size=1)
 
-    update_interval = 1
-    rate = rospy.Rate(1 / update_interval)
+    ros_update_interval = 1
+    rate = rospy.Rate(1 / ros_update_interval)
     x = 0
     while not rospy.is_shutdown():
+        
+        sine_wave_update = 0.1 # 10 Hz
 
         setpoints = ServoCommand()
         
@@ -40,7 +42,7 @@ def publish_joint_angles():
                 setpoints.right_leg_ankle_setpoint = sine_value
 
         setpoint_publisher.publish(setpoints)
-        x+=0.1
+        x+= sine_wave_update
         rate.sleep()
 
 if __name__ == '__main__':
