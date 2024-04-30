@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find hardware)/launch/hardware.launch"></include>
+    <param name="hardcoded_sequence_location" value="$(find controls)/src/keyframes.csv" />
+    <node pkg="controls" type="create_hardcoded_sequence.py" name="create_hardcoded_sequence" respawn="false" output="screen" />
+</launch>
