@@ -9,8 +9,8 @@ def play_back_keyframes():
     raw_keyframes = []
     interpolated_keyframes = []
 
-    TIME_PER_KEYFRAME = 0.25
-    X = 10  # number of interpolated keyframes per raw keyframe
+    TIME_PER_KEYFRAME = 1
+    X = 100  # number of interpolated keyframes per raw keyframe
 
     # load in raw keyframes
     with open(rospy.get_param("hardcoded_sequence_location"), "r") as f:
@@ -19,12 +19,14 @@ def play_back_keyframes():
             row = [float(x) for x in row.split(",")]
             raw_keyframes.append(row)
 
+    raw_keyframes.append(raw_keyframes[0])
+
+    interpolated_keyframes.append(raw_keyframes[0])
     # generate interpolated keyframes between the raw ones
     for i in range(len(raw_keyframes) - 1):
-        for j in range(len(raw_keyframes[i])):
-            interpolated_keyframes.append(
-                np.linspace(raw_keyframes[i][j], raw_keyframes[i + 1][j], X).tolist()
-            )
+        interpolated_keyframes.extend(
+            np.linspace(raw_keyframes[i], raw_keyframes[i + 1], X).tolist()
+        )
 
     # Add the last raw keyframe to the interpolated keyframes
     interpolated_keyframes.append(raw_keyframes[-1])
@@ -60,5 +62,3 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         print("Playing back sequence...")
         play_back_keyframes()
-        print("Sequence playback complete.")
-        rospy.sleep(5)

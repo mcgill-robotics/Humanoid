@@ -4,13 +4,13 @@
         <param name="ankle_frequency" value="0.3" />
         <param name="knee_frequency" value="0.3" />
         <param name="hip_frequency" value="0.3" />
-        <param name="ankle_ampl" value="20" />
+        <param name="ankle_ampl" value="45" />
         <param name="knee_ampl" value="50" />
-        <param name="hip_ampl" value="20" />
-        <param name="left_ankle_phase" value="110" />
+        <param name="hip_ampl" value="40" />
+        <param name="left_ankle_phase" value="-45" />
         <param name="left_knee_phase" value="45" />
         <param name="left_hip_phase" value="0" />
-        <param name="right_ankle_phase" value="290" />
+        <param name="right_ankle_phase" value="135" />
         <param name="right_knee_phase" value="225" />
         <param name="right_hip_phase" value="180" />
     </node>

@@ -27,9 +27,21 @@ def publish_joint_angles():
     setpoints.right_arm_elbow_setpoint = 150
     setpoints.left_arm_shoulder_setpoint = 150
     setpoints.right_arm_shoulder_setpoint = 150
+
+    # A = [[150,100, 150, 100],
+    # [180,70, 150, 100],
+    # [150,100, 130, 90],
+    # [150,100, 130, 70],
+    # [150,100, 180, 100],
+    # [130,90, 150, 100],
+    # [130, 70, 150,100]]
+
     
     while not rospy.is_shutdown():
-    
+
+        # for i in range(50):
+
+
         setpoints.left_leg_ankle_setpoint = 150 + generate_sine_wave(rospy.get_param("~ankle_frequency"), rospy.get_param("~ankle_ampl"), rospy.get_param("~left_ankle_phase"))
         setpoints.left_leg_knee_setpoint = 100 + generate_sine_wave(rospy.get_param("~knee_frequency"), rospy.get_param("~knee_ampl"), rospy.get_param("~left_knee_phase"))
         setpoints.left_leg_hip_pitch_setpoint = 150 + generate_sine_wave(rospy.get_param("~hip_frequency"), rospy.get_param("~hip_ampl"), rospy.get_param("~left_hip_phase"))
