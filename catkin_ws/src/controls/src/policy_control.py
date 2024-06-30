@@ -7,11 +7,12 @@ import torch
 from stable_baselines3 import SAC
 from state_generator import StateGenerator, JOINTS
 
+_JOINTS = list(JOINTS.values())
 
 def scaleActionToJointLimits(action):
     scaled_action = []
     for i in range(len(action)):
-        joint_range = JOINTS.items()[i]
+        joint_range = _JOINTS[i]
         if action[i] < 0:
             scaled_cmd = 150 + action[i] * joint_range[0]
         else:
@@ -28,7 +29,7 @@ def generateControl(_):
     setpoints = ServoCommand()
     for i, joint_name in enumerate(JOINTS.keys()):
         try:
-            setpoints.set_attr(joint_name, scaled_action[i])
+            setattr(setpoints, joint_name, scaled_action[i])
         except:
             print("Failed to set setpoint for joint: {}".format(joint_name))
 

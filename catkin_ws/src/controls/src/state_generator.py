@@ -46,9 +46,10 @@ class StateGenerator:
         joint_positions = []
         for joint_name in JOINTS.keys():
             try:
-                joint_pos = msg.get_attr(joint_name)
+                joint_pos = getattr(msg, joint_name)[0]
                 joint_positions.append(joint_pos)
-            except:
+            except Exception as e:
+                print(str(e))
                 print(
                     "WARN: Joint feedback values incomplete. Missing {}!".format(
                         joint_name
