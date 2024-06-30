@@ -1,8 +1,0 @@
-float32 right_left_forward
-float32 right_left_back
-float32 right_right_forward
-float32 right_right_back
-float32 left_left_forward
-float32 left_left_back
-float32 left_right_forward
-float32 left_right_back

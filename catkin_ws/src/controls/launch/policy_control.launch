@@ -1,7 +1,6 @@
 <launch>
     <node pkg="controls" type="policy_control.py" name="policy_controller" respawn="false" output="screen">
         <param name="control_interval" value="0.01" />
-        <param name="num_control_outputs" value="16" />
-        <param name="model_checkpoint_path" value="$(find controls)/model_weights/best_model.zip" />
+        <param name="model_checkpoint_path" value="$(find controls)/model_weights/standing.zip" />
     </node>
 </launch>
