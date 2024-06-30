@@ -46,7 +46,7 @@ class StateGenerator:
         joint_positions = []
         for joint_name in JOINTS.keys():
             try:
-                joint_pos = msg.get_attr(joint_name + "_fb")
+                joint_pos = msg.get_attr(joint_name)
                 joint_positions.append(joint_pos)
             except:
                 print(

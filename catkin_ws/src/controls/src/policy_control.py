@@ -28,7 +28,7 @@ def generateControl(_):
     setpoints = ServoCommand()
     for i, joint_name in enumerate(JOINTS.keys()):
         try:
-            setpoints.set_attr(joint_name + "_setpoint", scaled_action[i])
+            setpoints.set_attr(joint_name, scaled_action[i])
         except:
             print("Failed to set setpoint for joint: {}".format(joint_name))
 
