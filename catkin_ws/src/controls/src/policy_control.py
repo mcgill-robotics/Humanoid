@@ -14,7 +14,7 @@ def scaleActionToJointLimits(action):
     for i in range(len(action)):
         joint_range = _JOINTS[i]
         if action[i] < 0:
-            scaled_cmd = 150 + action[i] * joint_range[0]
+            scaled_cmd = 150 + (-1 * action[i]) * joint_range[0]
         else:
             scaled_cmd = 150 + action[i] * joint_range[1]
         scaled_action.append(scaled_cmd)
