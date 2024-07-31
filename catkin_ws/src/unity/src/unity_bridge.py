@@ -9,21 +9,21 @@ import quaternion
 
 def unityStateCb(msg):
     unityQuat = msg.quat
-    unityAngVel = msg.ang_vel
-    unityLinAccel = msg.local_lin_accel
-    unityGlobalVel = msg.global_vel
-
-    quat  = q_NWU_NED * np.quaternion(unityQuat.w, unityQuat.x, unityQuat.y, unityQuat.z) * q_NWU_NED.conj()
+    quat = q_NWU_NED * np.quaternion(unityQuat.w, unityQuat.x, unityQuat.y, unityQuat.z) * q_NWU_NED.conj()
     ros_quat = Quaternion(x=quat.x, y=quat.y, z=quat.z, w=quat.w)
 
+    unityGlobalVel = msg.global_vel
     global_vel = Vector3(x=unityGlobalVel.z, y=-unityGlobalVel.x, z=0)
     
-    global_lin_accel = np.array([unityLinAccel.z, -unityLinAccel.x, unityLinAccel.y])
+    unityLinAccel = msg.local_lin_accel
+    global_lin_accel = np.array([-unityLinAccel.z, unityLinAccel.x, -unityLinAccel.y])
     local_lin_accel = quaternion.rotate_vectors(quat.conj(), global_lin_accel)
     ros_local_lin = Vector3(x=local_lin_accel[0], y=local_lin_accel[1], z=local_lin_accel[2])
 
-    global_ang_vel = np.array([unityAngVel.z, -unityAngVel.x, unityAngVel.y])
-    local_ang_vel = quaternion.rotate_vectors(quat.conj(), global_ang_vel)
+    unityAngVel = msg.ang_vel
+    global_ang_vel_NED = np.pi * np.array([-unityAngVel.z, unityAngVel.x, -unityAngVel.y]) / 180
+    global_ang_vel_NWU = np.array([global_ang_vel_NED[0], -global_ang_vel_NED[1], -global_ang_vel_NED[2]])
+    local_ang_vel = quaternion.rotate_vectors(quat.conj(), global_ang_vel_NWU)
     ros_ang_vel = Vector3(x=local_ang_vel[0], y=local_ang_vel[1], z=local_ang_vel[2])
 
     pub_global_vel.publish(global_vel)

@@ -7,16 +7,14 @@ import torch
 from stable_baselines3 import SAC
 from state_generator import StateGenerator, JOINTS
 
-_JOINTS = list(JOINTS.values())
 
 def scaleActionToJointLimits(action):
     scaled_action = []
     for i in range(len(action)):
-        joint_range = _JOINTS[i]
-        if action[i] < 0:
-            scaled_cmd = 150 + (-1 * action[i]) * joint_range[0]
-        else:
-            scaled_cmd = 150 + action[i] * joint_range[1]
+        _, joint_range = JOINTS[i]
+        action_deg = 90 * action[i]
+        action_limited = np.clip(action_deg, joint_range[0], joint_range[1])
+        scaled_cmd = 150 + action_limited
         scaled_action.append(scaled_cmd)
     return np.array(scaled_action)
 
@@ -24,14 +22,15 @@ def scaleActionToJointLimits(action):
 def generateControl(_):
     obs = stateGenerator.getStateObservation()
     action, _ = ppo_agent.predict(obs, deterministic=True)
+    # print("ACTION: " + str(action))
     scaled_action = scaleActionToJointLimits(action)
 
     setpoints = ServoCommand()
-    for i, joint_name in enumerate(JOINTS.keys()):
+    for i in range(JOINTS):
         try:
-            setattr(setpoints, joint_name, scaled_action[i])
+            setattr(setpoints, JOINTS[i][0], scaled_action[i])
         except:
-            print("Failed to set setpoint for joint: {}".format(joint_name))
+            print("Failed to set setpoint for joint: {}".format(JOINTS[i][0]))
 
     setpoint_publisher.publish(setpoints)
 
