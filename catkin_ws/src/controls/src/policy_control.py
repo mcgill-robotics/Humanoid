@@ -26,7 +26,7 @@ def generateControl(_):
     scaled_action = scaleActionToJointLimits(action)
 
     setpoints = ServoCommand()
-    for i in range(JOINTS):
+    for i in range(len(JOINTS)):
         try:
             setattr(setpoints, JOINTS[i][0], scaled_action[i])
         except:
