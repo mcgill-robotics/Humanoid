@@ -12,7 +12,8 @@ def scaleActionToJointLimits(action):
     scaled_action = []
     for i in range(len(action)):
         _, joint_range = JOINTS[i]
-        action_deg = 90 * action[i]
+        action_rad = action[i] * (np.pi / 2)
+        action_deg = 180 * action_rad / np.pi
         action_limited = np.clip(action_deg, joint_range[0], joint_range[1])
         scaled_cmd = 150 + action_limited
         scaled_action.append(scaled_cmd)
@@ -46,8 +47,13 @@ if __name__ == "__main__":
 
     ppo_agent = SAC.load(path=rospy.get_param("~model_checkpoint_path"))
 
-    timer = rospy.Timer(
-        rospy.Duration(float(rospy.get_param("~control_interval"))), generateControl
-    )
+    control_interval = float(rospy.get_param("~control_interval"))
+    if control_interval < 0:
+        while not rospy.is_shutdown():
+            generateControl(None)
+    else:
+        timer = rospy.Timer(
+            rospy.Duration(), generateControl
+        )
 
-    rospy.spin()
+        rospy.spin()

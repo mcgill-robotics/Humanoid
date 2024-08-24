@@ -28,7 +28,7 @@ def unityStateCb(msg):
 
     unityAngVel = msg.ang_vel
     global_ang_vel = (
-        np.pi * np.array([unityAngVel.z, -unityAngVel.x, -unityAngVel.y]) / 180
+        np.pi * np.array([-unityAngVel.z, unityAngVel.x, -unityAngVel.y]) / 180
     )
     local_ang_vel = quaternion.rotate_vectors(quat.conj(), global_ang_vel)
     ros_ang_vel = Vector3(x=local_ang_vel[0], y=local_ang_vel[1], z=local_ang_vel[2])

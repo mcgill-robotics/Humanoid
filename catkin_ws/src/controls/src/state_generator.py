@@ -64,11 +64,11 @@ class StateGenerator:
         self.received_states[1] = True
 
     def updateAngVel(self, msg):
-        self.current_ang_vel = np.array([msg.x, msg.y, msg.z])
+        self.current_local_ang_vel = np.array([msg.x, msg.y, msg.z])
         self.received_states[2] = True
 
     def updateQuat(self, msg):
-        self.current_gravity_dir = inverseRotateVectors(msg, np.array([0, 0, -1]))
+        self.current_local_gravity_vector = inverseRotateVectors(msg, np.array([0, 0, -1]))
         self.received_states[3] = True
 
     def getStateObservation(self):
@@ -79,17 +79,17 @@ class StateGenerator:
                 )
             )
 
-        print("Current joint positions: {}".format(self.current_joint_positions))
-        print("Current joint velocities: {}".format(self.current_joint_velocities))
-        print("Current angular velocity: {}".format(self.current_ang_vel))
-        print("Current gravity direction: {}".format(self.current_gravity_dir))
+        # print("Current joint positions: {}".format(self.current_joint_positions))
+        # print("Current joint velocities: {}".format(self.current_joint_velocities))
+        # print("Current angular velocity: {}".format(self.current_local_ang_vel))
+        # print("Current gravity direction: {}".format(self.current_local_gravity_vector))
 
         return np.concatenate(
             (
                 self.current_joint_positions,
                 self.current_joint_velocities,
-                self.current_ang_vel,
-                self.current_gravity_dir,
+                self.current_local_ang_vel,
+                self.current_local_gravity_vector,
             )
         )
 
