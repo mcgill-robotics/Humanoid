@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find hardware_interface)/launch/hardware_interface.launch"></include>
+    <node pkg="hardware_interface" type="hardware_interface.py" name="hardware_interface" respawn="false" output="screen">
+    </node>
+</launch>
