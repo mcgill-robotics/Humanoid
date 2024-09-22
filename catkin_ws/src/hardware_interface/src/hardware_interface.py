@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rospy
 import numpy as np
 from humanoid_msgs.msg import HardwareServoCommand, ServoFeedback, HardwareServoFeedback, ServoCommand
