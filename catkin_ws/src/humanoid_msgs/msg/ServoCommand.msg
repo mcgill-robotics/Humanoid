@@ -1,4 +1,3 @@
-#Each joint motor has 1 float32 value to set its angle to (degrees)
 float32 right_shoulder_pitch
 float32 right_shoulder_roll
 float32 right_elbow

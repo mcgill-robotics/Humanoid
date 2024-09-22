@@ -1,10 +1,10 @@
 import rospy
-from humanoid_msgs.msg import ServoCommand, UnityServoCommand
+from humanoid_msgs.msg import ServoCommand, SimServoCommand
 
 # TODO change servo control publisher in unity
 # TODO create mujoco connection to ros
 
-def unityServoCommandCb(msg):
+def simServoCommandCb(msg):
     setpoints = ServoCommand()
     setpoints.left_leg_ankle_setpoint = msg.left_leg_ankle_setpoint
     setpoints.left_leg_knee_setpoint = msg.left_leg_knee_setpoint
@@ -28,11 +28,12 @@ def unityServoCommandCb(msg):
 
 if __name__ == "__main__":
     rospy.init_node("hardware_interface")
-
+    
     # publishers
-    setpoint_publisher = rospy.Publisher('/servosCommand', ServoCommand, queue_size=1)
-
+    setpoint_publisher = rospy.Publisher('/hardware/servos/command', HardwareServoCommand, queue_size=1)
+    feedback_publisher = rospy.Publisher('/servos/feedback', ServoFeedback, queue_size=1)
     # subscribers
-    rospy.Subscriber("/unity/servosCommandPosition", UnityServoCommand, unityServoCommandCb)
+    rospy.Subscriber("/servos/command", ServoCommand, simServoCommandCb)
+    rospy.Subscriber("/hardware/servos/feedback", HardwareServoFeedback, simServoCommandCb)
 
     rospy.spin()
