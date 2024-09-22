@@ -3,5 +3,7 @@
     <node name="rosserial" pkg="rosserial_python" type="serial_node.py" respawn="false" output="screen">
         <param name="port" type="string" value="/dev/ttyACM0"/>
         <param name="baud" type="int" value="57600"/>
+        <remap from="/servosCommand" to="/hardware/servos/command"/>
+        <remap from="/servosFeedback" to="/hardware/servos/feedback"/>
     </node>
 </launch>
