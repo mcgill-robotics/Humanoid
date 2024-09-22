@@ -8,30 +8,18 @@ from stable_baselines3 import SAC
 from state_generator import StateGenerator, JOINTS
 
 
-def scaleActionToJointLimits(action):
-    scaled_action = []
-    for i in range(len(action)):
-        _, joint_range = JOINTS[i]
-        action_rad = action[i] * (np.pi / 2)
-        action_deg = 180 * action_rad / np.pi
-        action_limited = np.clip(action_deg, joint_range[0], joint_range[1])
-        scaled_cmd = 150 + action_limited
-        scaled_action.append(scaled_cmd)
-    return np.array(scaled_action)
-
-
 def generateControl(_):
     obs = stateGenerator.getStateObservation()
     action, _ = ppo_agent.predict(obs, deterministic=True)
     # print("ACTION: " + str(action))
-    scaled_action = scaleActionToJointLimits(action)
+    scaled_action = action * (np.pi / 2)
 
     setpoints = ServoCommand()
     for i in range(len(JOINTS)):
         try:
-            setattr(setpoints, JOINTS[i][0], scaled_action[i])
+            setattr(setpoints, JOINTS[i], scaled_action[i])
         except:
-            print("Failed to set setpoint for joint: {}".format(JOINTS[i][0]))
+            print("Failed to set setpoint for joint: {}".format(JOINTS[i]))
 
     setpoint_publisher.publish(setpoints)
 
@@ -41,7 +29,7 @@ if not torch.cuda.is_available():
 
 if __name__ == "__main__":
     rospy.init_node("policy_controller")
-    setpoint_publisher = rospy.Publisher("/servosCommand", ServoCommand, queue_size=1)
+    setpoint_publisher = rospy.Publisher("/servos/command", ServoCommand, queue_size=1)
 
     stateGenerator = StateGenerator()
 
@@ -52,8 +40,6 @@ if __name__ == "__main__":
         while not rospy.is_shutdown():
             generateControl(None)
     else:
-        timer = rospy.Timer(
-            rospy.Duration(), generateControl
-        )
+        timer = rospy.Timer(rospy.Duration(), generateControl)
 
         rospy.spin()

@@ -7,6 +7,9 @@
         <param name="ankle_ampl" value="45" />
         <param name="knee_ampl" value="50" />
         <param name="hip_ampl" value="40" />
+        <param name="ankle_center_offset" value="0" />
+        <param name="knee_center_offset" value="-50" />
+        <param name="hip_center_offset" value="0" />
         <param name="left_ankle_phase" value="-45" />
         <param name="left_knee_phase" value="45" />
         <param name="left_hip_phase" value="0" />

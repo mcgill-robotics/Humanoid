@@ -29,7 +29,7 @@ class StateGenerator:
         self.received_states = [False, False, False, False]
 
         self.joint_state_sub = rospy.Subscriber(
-            "/servosFeedback", ServoFeedback, self.updateJointStates
+            "/servos/feedback", ServoFeedback, self.updateJointStates
         )
         self.ang_vel_sub = rospy.Subscriber(
             "/state/ang_vel", Vector3, self.updateAngVel
@@ -39,16 +39,13 @@ class StateGenerator:
     def updateJointStates(self, msg):
         joint_positions = []
         joint_velocities = []
-        for joint_name, _ in JOINTS:
+        for joint_name in JOINTS:
             try:
                 joint_pos = getattr(msg, joint_name)[0]
-                # convert to radians
-                joint_pos_scaled = np.deg2rad(joint_pos - 150)
-                joint_positions.append(joint_pos_scaled)
+                joint_positions.append(joint_pos)
 
                 joint_vel = getattr(msg, joint_name)[1]
-                joint_vel_scaled = np.deg2rad(joint_vel)
-                joint_velocities.append(joint_vel_scaled)
+                joint_velocities.append(joint_vel)
             except Exception as e:
                 print(str(e))
                 print(
@@ -68,7 +65,9 @@ class StateGenerator:
         self.received_states[2] = True
 
     def updateQuat(self, msg):
-        self.current_local_gravity_vector = inverseRotateVectors(msg, np.array([0, 0, -1]))
+        self.current_local_gravity_vector = inverseRotateVectors(
+            msg, np.array([0, 0, -1])
+        )
         self.received_states[3] = True
 
     def getStateObservation(self):
@@ -95,16 +94,16 @@ class StateGenerator:
 
 
 JOINTS = [
-    ("right_shoulder_pitch", [-90, 90]),
-    ("right_shoulder_roll", [-90, 0]),
-    ("right_elbow", [-90, 0]),
-    ("left_shoulder_pitch", [-90, 90]),
-    ("left_shoulder_roll", [0, 90]),
-    ("left_elbow", [-90, 0]),
-    ("left_hip_roll", [-90, 90]),
-    ("left_hip_pitch", [-90, 90]),
-    ("left_knee", [0, 90]),
-    ("right_hip_roll", [-90, 90]),
-    ("right_hip_pitch", [-90, 90]),
-    ("right_knee", [0, 90]),
+    "right_shoulder_pitch",
+    "right_shoulder_roll",
+    "right_elbow",
+    "left_shoulder_pitch",
+    "left_shoulder_roll",
+    "left_elbow",
+    "left_hip_roll",
+    "left_hip_pitch",
+    "left_knee",
+    "right_hip_roll",
+    "right_hip_pitch",
+    "right_knee",
 ]
