@@ -52,7 +52,9 @@ class UnityService(RosReceiver):
         Returns:
             The response message
         """
-        return self.tcp_server.send_unity_service(self.topic, self.service_class, request)
+        return self.tcp_server.send_unity_service(
+            self.topic, self.service_class, request
+        )
 
     def unregister(self):
         """

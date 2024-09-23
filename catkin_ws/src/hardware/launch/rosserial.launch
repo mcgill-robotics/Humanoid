@@ -6,4 +6,5 @@
         <remap from="/servosCommand" to="/hardware/servos/command"/>
         <remap from="/servosFeedback" to="/hardware/servos/feedback"/>
     </node>
+    <include file="$(find hardware)/launch/interface.launch"/>
 </launch>

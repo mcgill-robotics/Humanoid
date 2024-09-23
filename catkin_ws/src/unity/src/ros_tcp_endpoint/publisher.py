@@ -35,7 +35,9 @@ class RosPublisher(RosSender):
         node_name = "{}_RosPublisher".format(strippedTopic)
         RosSender.__init__(self, node_name)
         self.msg = message_class()
-        self.pub = rospy.Publisher(topic, message_class, queue_size=queue_size, latch=latch)
+        self.pub = rospy.Publisher(
+            topic, message_class, queue_size=queue_size, latch=latch
+        )
 
     def send(self, data):
         """

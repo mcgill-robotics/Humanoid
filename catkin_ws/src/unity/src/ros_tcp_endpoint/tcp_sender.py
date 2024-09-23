@@ -134,7 +134,9 @@ class UnityTcpSender:
             topics_and_types = rospy.get_published_topics()
             topic_list.topics = [item[0] for item in topics_and_types]
             topic_list.types = [item[1] for item in topics_and_types]
-            serialized_bytes = ClientThread.serialize_command("__topic_list", topic_list)
+            serialized_bytes = ClientThread.serialize_command(
+                "__topic_list", topic_list
+            )
             self.queue.put(serialized_bytes)
 
     def start_sender(self, conn, halt_event):

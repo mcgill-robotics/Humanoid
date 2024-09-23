@@ -163,7 +163,8 @@ class ClientThread(threading.Thread):
         else:
             ros_communicator = self.tcp_server.ros_services_table[destination]
             service_thread = threading.Thread(
-                target=self.service_call_thread, args=(srv_id, destination, data, ros_communicator)
+                target=self.service_call_thread,
+                args=(srv_id, destination, data, ros_communicator),
             )
             service_thread.daemon = True
             service_thread.start()
@@ -178,7 +179,9 @@ class ClientThread(threading.Thread):
             # TODO: send a response to Unity anyway?
             return
 
-        self.tcp_server.unity_tcp_sender.send_ros_service_response(srv_id, destination, response)
+        self.tcp_server.unity_tcp_sender.send_ros_service_response(
+            srv_id, destination, response
+        )
 
     def run(self):
         """
