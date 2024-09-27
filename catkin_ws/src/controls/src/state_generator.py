@@ -26,6 +26,7 @@ class StateGenerator:
         self.current_joint_velocities = np.array([0] * len(JOINTS))
         self.current_local_ang_vel = np.array([0, 0, 0])
         self.current_local_gravity_vector = np.array([0, 0, -1])
+        self.current_quaternion = np.array([1,0,0,0])
         self.received_states = [False, False, False, False]
 
         self.joint_state_sub = rospy.Subscriber(
@@ -68,9 +69,14 @@ class StateGenerator:
         self.current_local_gravity_vector = inverseRotateVectors(
             msg, np.array([0, 0, -1])
         )
+        self.current_quaternion = np.array([msg.w, msg.x, msg.y, msg.z])
         self.received_states[3] = True
 
-    def getStateObservation(self):
+    def _check_states(self):
+        # print("Current joint positions: {}".format(self.current_joint_positions))
+        # print("Current joint velocities: {}".format(self.current_joint_velocities))
+        # print("Current angular velocity: {}".format(self.current_local_ang_vel))
+        # print("Current gravity direction: {}".format(self.current_local_gravity_vector))
         if not all(self.received_states):
             print(
                 "WARN: State space for policy incomplete. {}".format(
@@ -78,10 +84,17 @@ class StateGenerator:
                 )
             )
 
-        # print("Current joint positions: {}".format(self.current_joint_positions))
-        # print("Current joint velocities: {}".format(self.current_joint_velocities))
-        # print("Current angular velocity: {}".format(self.current_local_ang_vel))
-        # print("Current gravity direction: {}".format(self.current_local_gravity_vector))
+    def getMPCObservation(self):
+        self._check_states()
+        return (
+            self.current_joint_positions,
+            self.current_joint_velocities,
+            self.current_local_ang_vel,
+            self.current_quaternion,
+        )
+
+    def getStateObservation(self):
+        self._check_states()
 
         return np.concatenate(
             (

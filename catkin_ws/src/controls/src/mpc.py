@@ -7,29 +7,49 @@ import numpy as np
 import torch
 from stable_baselines3 import SAC
 from state_generator import StateGenerator, JOINTS
+import json
 
-
-def generateControl(_):
-    obs = stateGenerator.getStateObservation()
-    socket.send_string("Hello, Server!")  # Send request
-
-    message = socket.recv_string()  # Receive the reply
-    print(f"Received reply: {message}")
-
-    # setpoint_publisher.publish(setpoints)
-
-
-if not torch.cuda.is_available():
-    print("WARN: Running policy on CPU!")
-
-if __name__ == "__main__":
-    rospy.init_node("policy_controller")
-    setpoint_publisher = rospy.Publisher("/servos/command", ServoCommand, queue_size=1)
-    stateGenerator = StateGenerator()
-
+def setupConnection():
+    global context, socket
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
-    socket.connect("tcp://humanoid-mpc:5555")
+    socket.connect("tcp://localhost:5555")
+    socket.setsockopt(zmq.RCVTIMEO, 1000) # 1 second timeout
+
+def generateControl(_):
+    joint_pos, joint_vel, ang_vel, quat = stateGenerator.getMPCObservation()
+    state_json = {
+        "joint_pos": [float(x) for x in joint_pos],
+        "joint_vel": [float(x) for x in joint_vel],
+        "ang_vel": [float(x) for x in ang_vel],
+        "quat": [float(x) for x in quat],
+    }
+    str_state_json = json.dumps(state_json)
+
+    try:
+        socket.send_string(str_state_json)
+        message = socket.recv_string()
+    except zmq.Again as e:
+        print("Timeout while waiting for MPC server.")
+        setupConnection()
+        message = json.dumps([0.0] * len(JOINTS))
+        
+    torques_arr = json.loads(message)
+    command = ServoCommand()
+    for i in range(len(JOINTS)):
+        try:
+            setattr(command, JOINTS[i], torques_arr[i])
+        except Exception as e:
+            print("Failed to set torque for joint: {}. Error: {}".format(JOINTS[i], str(e)))
+
+    command_pub.publish(command)
+
+
+if __name__ == "__main__":
+    rospy.init_node("mpc")
+    command_pub = rospy.Publisher("/servos/command", ServoCommand, queue_size=1)
+    stateGenerator = StateGenerator()
+    setupConnection()
 
     control_interval = float(rospy.get_param("~control_interval"))
     if control_interval < 0:
