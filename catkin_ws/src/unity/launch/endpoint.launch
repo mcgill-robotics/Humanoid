@@ -1,5 +1,5 @@
 <launch>
-    <arg name="tcp_ip" default="0.0.0.0"/>
+    <arg name="tcp_ip" default="localhost"/>
     <arg name="tcp_port_sim" default="10000"/>
     <arg name="tcp_port_vis" default="10001"/>
 
