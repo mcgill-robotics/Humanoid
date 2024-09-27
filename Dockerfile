@@ -14,3 +14,4 @@ RUN pip3 install numpy-quaternion
 RUN pip3 install stable-baselines3[extra]
 RUN pip3 install tensorflow
 RUN apt-get install -y tmux
+RUN pip3 install pyzmq

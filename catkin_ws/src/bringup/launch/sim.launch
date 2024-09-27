@@ -1,4 +1,4 @@
 <launch>
-    <include file="$(find controls)/launch/policy_control.launch"></include>
+    <include file="$(find controls)/launch/mpc.launch"></include>
     <include file="$(find unity)/launch/sim.launch"></include>
 </launch>

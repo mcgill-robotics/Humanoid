@@ -4,14 +4,14 @@ services:
       - DISPLAY=novnc:0.0 
       - UDEV=on
     image: mcgillrobotics/humanoid:latest
+    build: .
     volumes:
-      # - /dev:/dev  # uncomment when using real servos
       - ./:/root/Humanoid
+      # - /dev:/dev  # uncomment when using real servos
     # privileged: true  # uncomment when using real servos
     command: bash -c "chmod -R +x /root/Humanoid/catkin_ws/src && tail -f /dev/null"
-    ports:
-      - "10000:10000"
-      - "10001:10001"
+    container_name: humanoid_ros
+    network_mode: host
     deploy:
       resources:
         reservations:
