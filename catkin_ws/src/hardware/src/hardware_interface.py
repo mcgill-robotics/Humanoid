@@ -47,6 +47,7 @@ def commandCb(msg):
     for software_joint, hardware_joint in JOINTS_MAPPINGS_SOFTWARE_HARDWARE.items():
         joint_specs = rospy.get_param("~" + software_joint)
         direction = joint_specs[2]
+        joint_center = rospy.get_param("~" + software_joint + "_center")
 
         if direction > 0:
             upper_joint_limit = joint_specs[0]
@@ -55,7 +56,7 @@ def commandCb(msg):
             upper_joint_limit = -joint_specs[1]
             lower_joint_limit = -joint_specs[0]
 
-        joint_setpoint = 180 + clamp(
+        joint_setpoint = joint_center + clamp(
             direction * radians_to_degrees(getattr(msg, software_joint)),
             lower_joint_limit,
             upper_joint_limit,
@@ -71,12 +72,14 @@ def feedbackCb(msg):
     for software_joint, hardware_joint in JOINTS_MAPPINGS_SOFTWARE_HARDWARE.items():
         joint_specs = rospy.get_param("~" + software_joint)
         direction = joint_specs[2]
-
+        
+        joint_center = rospy.get_param("~" + software_joint + "_center")
+        
         hw_feedback_tuple = getattr(msg, hardware_joint)
         sw_feedback_tuple = []
 
         if len(hw_feedback_tuple) > 0:
-            joint_pos = direction * degrees_to_radians(hw_feedback_tuple[0] - 180)
+            joint_pos = direction * degrees_to_radians(hw_feedback_tuple[0] - joint_center)
             sw_feedback_tuple.append(joint_pos)
 
         if len(hw_feedback_tuple) > 1:
