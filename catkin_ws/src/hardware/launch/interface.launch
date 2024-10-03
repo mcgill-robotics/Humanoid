@@ -2,15 +2,15 @@
     <node pkg="hardware" type="hardware_interface.py" name="hardware_interface" respawn="false" output="screen">
         <!-- The specs for each joint consists of an array of three values : [upper_limit, lower_limit, direction] -->
         <rosparam param="right_shoulder_pitch"> [90.0, -90.0, 1.0]</rosparam>
-        <rosparam param="right_shoulder_roll"> [90.0, -90.0, 1.0]</rosparam>
+        <rosparam param="right_shoulder_roll"> [90.0, -90.0, -1.0]</rosparam>
         <rosparam param="right_elbow"> [90.0, -90.0, 1.0]</rosparam>
-        <rosparam param="left_shoulder_pitch"> [90.0, -90.0, 1.0]</rosparam>
+        <rosparam param="left_shoulder_pitch"> [90.0, -90.0, -1.0]</rosparam>
         <rosparam param="left_shoulder_roll"> [90.0, -90.0, 1.0]</rosparam>
-        <rosparam param="left_elbow"> [90.0, -90.0, 1.0]</rosparam>
+        <rosparam param="left_elbow"> [90.0, -90.0, -1.0]</rosparam>
         <rosparam param="left_hip_roll"> [90.0, -90.0, 1.0]</rosparam>
-        <rosparam param="left_hip_pitch"> [90.0, -90.0, 1.0]</rosparam>
+        <rosparam param="left_hip_pitch"> [90.0, -90.0, -1.0]</rosparam>
         <rosparam param="left_knee"> [90.0, -90.0, 1.0]</rosparam>
-        <rosparam param="right_hip_roll"> [90.0, -90.0, 1.0]</rosparam>
+        <rosparam param="right_hip_roll"> [90.0, -90.0, -1.0]</rosparam>
         <rosparam param="right_hip_pitch"> [90.0, -90.0, 1.0]</rosparam>
         <rosparam param="right_knee"> [90.0, -90.0, 1.0]</rosparam>
         <rosparam param="right_shoulder_pitch_center">180</rosparam>

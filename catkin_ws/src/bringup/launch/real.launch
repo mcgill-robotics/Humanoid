@@ -1,5 +1,5 @@
 <launch>
     <include file="$(find hardware)/launch/hardware.launch"></include>
-    <include file="$(find controls)/launch/policy_control.launch"></include>
+    <!-- <include file="$(find controls)/launch/policy_control.launch"></include> -->
     <include file="$(find unity)/launch/visualization.launch"></include>
 </launch>
