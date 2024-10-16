@@ -4,6 +4,9 @@ services:
       - DISPLAY=novnc:0.0 
       - UDEV=on
     image: mcgillrobotics/humanoid:latest
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    privileged: true
     build: .
     volumes:
       - ./:/root/Humanoid
