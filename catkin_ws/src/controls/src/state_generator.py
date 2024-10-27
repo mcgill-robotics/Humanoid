@@ -43,6 +43,9 @@ class StateGenerator:
         for joint_name in JOINTS:
             try:
                 joint_pos = getattr(msg, joint_name)[0]
+                joint_pos = joint_pos % (2*np.pi)
+                if joint_pos > np.pi:
+                    joint_pos -= 2*np.pi
                 joint_positions.append(joint_pos)
 
                 joint_vel = getattr(msg, joint_name)[1]
