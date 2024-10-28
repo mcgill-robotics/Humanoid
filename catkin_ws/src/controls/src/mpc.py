@@ -9,12 +9,14 @@ from stable_baselines3 import SAC
 from state_generator import StateGenerator, JOINTS
 import json
 
+
 def setupConnection():
     global context, socket
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
     socket.connect("tcp://localhost:5555")
-    socket.setsockopt(zmq.RCVTIMEO, 1000) # 1 second timeout
+    socket.setsockopt(zmq.RCVTIMEO, 1000)  # 1 second timeout
+
 
 def generateControl(_):
     joint_pos, joint_vel, ang_vel, quat = stateGenerator.getMPCObservation()
@@ -33,14 +35,18 @@ def generateControl(_):
         print("Timeout while waiting for MPC server.")
         setupConnection()
         message = json.dumps([0.0] * len(JOINTS))
-        
-    torques_arr = json.loads(message)
+
+    command_arr = json.loads(message)
     command = ServoCommand()
     for i in range(len(JOINTS)):
         try:
-            setattr(command, JOINTS[i], torques_arr[i])
+            setattr(command, JOINTS[i], command_arr[i])
         except Exception as e:
-            print("Failed to set torque for joint: {}. Error: {}".format(JOINTS[i], str(e)))
+            print(
+                "Failed to set command for joint: {}. Error: {}".format(
+                    JOINTS[i], str(e)
+                )
+            )
 
     command_pub.publish(command)
 
