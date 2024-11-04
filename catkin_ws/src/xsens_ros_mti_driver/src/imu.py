@@ -6,6 +6,7 @@ import numpy as np
 from geometry_msgs.msg import Quaternion, Vector3
 import quaternion
 
+
 def imuDataCb(msg):
     imuQuat = msg.orientation
     quat = (
@@ -15,23 +16,24 @@ def imuDataCb(msg):
     )
     ros_quat = Quaternion(x=quat.x, y=quat.y, z=quat.z, w=quat.w)
 
-    # unityGlobalVel = msg.global_vel
-    # global_vel = Vector3(x=unityGlobalVel.z, y=-unityGlobalVel.x, z=0)
-
-    imuLinAccel = msg.linear_acceleration
-    global_lin_accel = np.array([-imuLinAccel.z, imuLinAccel.x, -imuLinAccel.y])
-    local_lin_accel = quaternion.rotate_vectors(quat.conj(), global_lin_accel)
+    lin_accel_imu = np.array(
+        [
+            msg.linear_acceleration.z,
+            msg.linear_acceleration.x,
+            msg.linear_acceleration.y,
+        ]
+    )
+    local_lin_accel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), lin_accel_imu)
     ros_local_lin = Vector3(
         x=local_lin_accel[0], y=local_lin_accel[1], z=local_lin_accel[2]
     )
 
-    imuAngVel = msg.angular_velocity
-    global_ang_vel = (np.array([imuAngVel.x, imuAngVel.y, imuAngVel.z]))
-
-    local_ang_vel = quaternion.rotate_vectors(quat.conj(), global_ang_vel)
+    ang_vel_imu = np.array(
+        [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
+    )
+    local_ang_vel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), ang_vel_imu)
     ros_ang_vel = Vector3(x=local_ang_vel[0], y=local_ang_vel[1], z=local_ang_vel[2])
 
-    # pub_global_vel.publish(global_vel)
     pub_quat.publish(ros_quat)
     pub_ang_vel.publish(ros_ang_vel)
     pub_local_lin.publish(ros_local_lin)
