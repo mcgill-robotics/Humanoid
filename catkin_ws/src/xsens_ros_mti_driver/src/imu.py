@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import rospy
-# from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Imu
 import numpy as np
-from geometry_msgs.msg import TwistStamped, QuaternionStamped, Vector3Stamped, Vector3, Quaternion
+from geometry_msgs.msg import QuaternionStamped, Vector3Stamped, Vector3, Quaternion
 import quaternion
 
 
@@ -20,7 +20,7 @@ def quatDataCb(msg):
 
 def twistDataCb(msg):
 
-    imuTwist = msg.twist
+    imuTwist = msg.angular_velocity
 
     ang_vel_imu = np.array(
     [imuTwist.x, imuTwist.y, imuTwist.z]
@@ -64,6 +64,6 @@ if __name__ == "__main__":
     # subscribers
     rospy.Subscriber("/filter/free_acceleration", Vector3Stamped, accelDataCb)
     rospy.Subscriber("/filter/quaternion", QuaternionStamped, quatDataCb)
-    rospy.Subscriber("/filter/twist", TwistStamped, twistDataCb)
+    rospy.Subscriber("/imu/data", Imu, twistDataCb)
 
     rospy.spin()
