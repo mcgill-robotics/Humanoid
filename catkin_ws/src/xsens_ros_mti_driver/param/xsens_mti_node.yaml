@@ -3,7 +3,7 @@
 ##  - port + baudrate information
 ##  - nothing: the driver scans for devices and selects the first found.
 # device_id: '077007EF' # uppercase hex string
-port: '/dev/ttyUSB0'
+# port: '/dev/ttyUSB0'
 # baudrate: 921600 # non necessary for some devices
 
 ## Log file (optional), placed in ~/.ros/ otherwise use absolute path

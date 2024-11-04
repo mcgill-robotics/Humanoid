@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 import rospy
-from sensor_msgs.msg import Imu
+# from sensor_msgs.msg import Imu
 import numpy as np
-from geometry_msgs.msg import Quaternion, Vector3
+from geometry_msgs.msg import TwistStamped, QuaternionStamped, Vector3Stamped, Vector3, Quaternion
 import quaternion
 
 
-def imuDataCb(msg):
-    imuQuat = msg.orientation
+def quatDataCb(msg):
+    imuQuat = msg.quaternion
     quat = (
         q_NWU_imuFrame
         * np.quaternion(imuQuat.w, imuQuat.x, imuQuat.y, imuQuat.z)
@@ -16,26 +16,36 @@ def imuDataCb(msg):
     )
     ros_quat = Quaternion(x=quat.x, y=quat.y, z=quat.z, w=quat.w)
 
+    pub_quat.publish(ros_quat)
+
+def twistDataCb(msg):
+
+    imuTwist = msg.twist
+
+    ang_vel_imu = np.array(
+    [imuTwist.x, imuTwist.y, imuTwist.z]
+    )
+    local_ang_vel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), ang_vel_imu)
+    ros_ang_vel = Vector3(x=local_ang_vel[1], y=local_ang_vel[2], z=local_ang_vel[0])
+
+    pub_ang_vel.publish(ros_ang_vel)
+
+def accelDataCb(msg):
+
+    imuLinAccel = msg.vector
+
     lin_accel_imu = np.array(
         [
-            msg.linear_acceleration.z,
-            msg.linear_acceleration.x,
-            msg.linear_acceleration.y,
+            imuLinAccel.x,
+            imuLinAccel.y,
+            imuLinAccel.z,
         ]
     )
     local_lin_accel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), lin_accel_imu)
     ros_local_lin = Vector3(
-        x=local_lin_accel[0], y=local_lin_accel[1], z=local_lin_accel[2]
+        x=local_lin_accel[1], y=local_lin_accel[2], z=local_lin_accel[0]
     )
 
-    ang_vel_imu = np.array(
-        [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
-    )
-    local_ang_vel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), ang_vel_imu)
-    ros_ang_vel = Vector3(x=local_ang_vel[0], y=local_ang_vel[1], z=local_ang_vel[2])
-
-    pub_quat.publish(ros_quat)
-    pub_ang_vel.publish(ros_ang_vel)
     pub_local_lin.publish(ros_local_lin)
 
 
@@ -52,6 +62,8 @@ if __name__ == "__main__":
     q_NWU_imuFrame = np.quaternion(0.707, 0, 0.707, 0)
 
     # subscribers
-    rospy.Subscriber("/imu/data", Imu, imuDataCb)
+    rospy.Subscriber("/filter/free_acceleration", Vector3Stamped, accelDataCb)
+    rospy.Subscriber("/filter/quaternion", QuaternionStamped, quatDataCb)
+    rospy.Subscriber("/filter/twist", TwistStamped, twistDataCb)
 
     rospy.spin()
