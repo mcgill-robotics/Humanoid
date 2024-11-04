@@ -4,14 +4,17 @@ services:
       - DISPLAY=novnc:0.0 
       - UDEV=on
     image: mcgillrobotics/humanoid:latest
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    privileged: true
     build: .
     volumes:
       - ./:/root/Humanoid
-      - /dev:/dev  # uncomment when using real servos
-    privileged: true  # uncomment when using real servos
+    #   - /dev:/dev  # uncomment when using real servos
+    # privileged: true  # uncomment when using real servos
     command: bash -c "chmod -R +x /root/Humanoid/catkin_ws/src && tail -f /dev/null"
     container_name: humanoid_ros
-    # network_mode: host # comment out to use unity vis/sim
+    network_mode: host # comment out to use unity vis/sim
     # # Uncomment to use GPU
     # deploy:
     #   resources:
