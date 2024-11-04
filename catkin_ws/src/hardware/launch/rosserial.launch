@@ -2,9 +2,10 @@
     <!-- For receiving/sending data from/to the servos and the foot sensors -->
     <node name="rosserial" pkg="rosserial_python" type="serial_node.py" respawn="false" output="screen">
         <param name="port" type="string" value="/dev/ttyACM0"/>
-        <param name="baud" type="int" value="57600"/>
+        <param name="baud" type="int" value="500000"/>
         <remap from="/servosCommand" to="/hardware/servos/command"/>
         <remap from="/servosFeedback" to="/hardware/servos/feedback"/>
+        <remap from="/servosMode" to="/hardware/servos/set_control_mode"/>
     </node>
     <include file="$(find hardware)/launch/interface.launch"/>
 </launch>

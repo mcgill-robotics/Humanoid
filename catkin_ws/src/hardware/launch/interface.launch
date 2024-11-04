@@ -25,5 +25,7 @@
         <rosparam param="right_hip_roll_center">90</rosparam>
         <rosparam param="right_hip_pitch_center">180</rosparam>
         <rosparam param="right_knee_center">180</rosparam>
+        
+        <rosparam param="default_to_position_control" value="true"/>
     </node>
 </launch>

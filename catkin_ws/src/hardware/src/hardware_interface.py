@@ -8,6 +8,8 @@ from humanoid_msgs.msg import (
     HardwareServoFeedback,
     ServoCommand,
 )
+from std_srvs.srv import Trigger, TriggerResponse
+from std_msgs.msg import Float32
 
 JOINTS_MAPPINGS_SOFTWARE_HARDWARE = {
     "right_shoulder_pitch": "right_shoulder_pitch",
@@ -41,7 +43,12 @@ def clamp(x, lower_limit, upper_limit):
     return max(lower_limit, min(x, upper_limit))
 
 
-def commandCb(msg):
+allow_commands = False
+
+
+def _position_command_cb(msg):
+    if not allow_commands:
+        return
     setpoints = HardwareServoCommand()
 
     for software_joint, hardware_joint in JOINTS_MAPPINGS_SOFTWARE_HARDWARE.items():
@@ -66,20 +73,37 @@ def commandCb(msg):
     setpoint_publisher.publish(setpoints)
 
 
+def _torque_command_cb(msg):
+    if not allow_commands:
+        return
+    setpoints = HardwareServoCommand()
+
+    for software_joint, hardware_joint in JOINTS_MAPPINGS_SOFTWARE_HARDWARE.items():
+        joint_specs = rospy.get_param("~" + software_joint)
+        direction = joint_specs[2]
+
+        torque_setpoint = 885 * (direction * getattr(msg, software_joint) / 1.4)
+        setattr(setpoints, hardware_joint, torque_setpoint)
+
+    setpoint_publisher.publish(setpoints)
+
+
 def feedbackCb(msg):
     feedback = ServoFeedback()
 
     for software_joint, hardware_joint in JOINTS_MAPPINGS_SOFTWARE_HARDWARE.items():
         joint_specs = rospy.get_param("~" + software_joint)
         direction = joint_specs[2]
-        
+
         joint_center = rospy.get_param("~" + software_joint + "_center")
-        
+
         hw_feedback_tuple = getattr(msg, hardware_joint)
         sw_feedback_tuple = []
 
         if len(hw_feedback_tuple) > 0:
-            joint_pos = direction * degrees_to_radians(hw_feedback_tuple[0] - joint_center)
+            joint_pos = direction * degrees_to_radians(
+                hw_feedback_tuple[0] - joint_center
+            )
             sw_feedback_tuple.append(joint_pos)
 
         if len(hw_feedback_tuple) > 1:
@@ -95,8 +119,40 @@ def feedbackCb(msg):
     feedback_publisher.publish(feedback)
 
 
+commandCb = (
+    _position_command_cb
+    if rospy.get_param("~default_to_position_control").lower() == "true"
+    else _torque_command_cb
+)
+
+
+def control_mode_cb(msg):
+    global commandCb
+    global allow_commands
+
+    allow_commands = False
+
+    if msg.data == 0:
+        control_mode_change_pub.publish(msg)
+        commandCb = _position_command_cb
+    elif msg.data == 1:
+        control_mode_change_pub.publish(msg)
+        commandCb = _torque_command_cb
+    else:
+        rospy.logwarn(
+            "Invalid control mode: %d. Continuing with previous control mode.", msg.data
+        )
+    rospy.sleep(1)
+    allow_commands = True
+
+
 if __name__ == "__main__":
     rospy.init_node("hardware_interface")
+
+    rospy.Subscriber("/servos/set_control_mode", Float32, control_mode_cb)
+    control_mode_change_pub = rospy.Publisher(
+        "hardware/servos/set_control_mode", Float32, queue_size=1
+    )
 
     rospy.Subscriber("/servos/command", ServoCommand, commandCb)
     setpoint_publisher = rospy.Publisher(
