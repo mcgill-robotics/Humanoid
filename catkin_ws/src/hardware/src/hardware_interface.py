@@ -119,12 +119,11 @@ def feedbackCb(msg):
     feedback_publisher.publish(feedback)
 
 
-commandCb = (
-    _position_command_cb
-    if rospy.get_param("~default_to_position_control").lower() == "true"
-    else _torque_command_cb
-)
+commandCb = _position_command_cb
 
+def commandCb_caller(msg):
+    global commandCb
+    commandCb(msg)
 
 def control_mode_cb(msg):
     global commandCb
@@ -154,7 +153,7 @@ if __name__ == "__main__":
         "hardware/servos/set_control_mode", Float32, queue_size=1
     )
 
-    rospy.Subscriber("/servos/command", ServoCommand, commandCb)
+    rospy.Subscriber("/servos/command", ServoCommand, commandCb_caller)
     setpoint_publisher = rospy.Publisher(
         "/hardware/servos/command", HardwareServoCommand, queue_size=1
     )
