@@ -15,3 +15,5 @@ RUN pip3 install numpy-quaternion
 # RUN pip3 install tensorflow
 RUN apt-get install -y tmux
 RUN pip3 install pyzmq
+RUN mkdir -p /etc/udev/rules.d/
+RUN echo 'SUBSYSTEM=="tty", ATTRS{idVendor}=="2639", ATTRS{idProduct}=="0300", MODE=="0666"' > /etc/udev/rules.d/99-usb-serial.rules
