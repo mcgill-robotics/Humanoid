@@ -11,7 +11,7 @@ RUN echo "source /root/Humanoid/catkin_ws/devel/setup.bash" >> ~/.bashrc
 RUN apt-get install -y ros-noetic-rosserial-arduino 
 RUN apt-get install -y ros-noetic-rosserial
 RUN pip3 install numpy-quaternion
-# RUN pip3 install stable-baselines3[extra]
+RUN pip3 install stable-baselines3
 # RUN pip3 install tensorflow
 RUN apt-get install -y tmux
 RUN pip3 install pyzmq

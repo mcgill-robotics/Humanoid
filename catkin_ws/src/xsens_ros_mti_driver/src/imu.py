@@ -9,12 +9,9 @@ import quaternion
 
 def quatDataCb(msg):
     imuQuat = msg.quaternion
-    quat = (
-        q_NWU_imuFrame
-        * np.quaternion(imuQuat.w, imuQuat.x, imuQuat.y, imuQuat.z)
-        * q_NWU_imuFrame.conj()
-    )
-    ros_quat = Quaternion(x=quat.x, y=quat.y, z=quat.z, w=quat.w)
+    quat = np.quaternion(imuQuat.w, imuQuat.x, imuQuat.y, imuQuat.z)
+    quat = quat * np.quaternion(0.7071068, 0, 0.7071068, 0)
+    ros_quat = Quaternion(w=quat.w, x=-quat.y, y=quat.x, z=quat.z)
 
     pub_quat.publish(ros_quat)
 
@@ -26,7 +23,7 @@ def twistDataCb(msg):
     [imuTwist.x, imuTwist.y, imuTwist.z]
     )
     local_ang_vel = quaternion.rotate_vectors(q_NWU_imuFrame.conj(), ang_vel_imu)
-    ros_ang_vel = Vector3(x=local_ang_vel[1], y=local_ang_vel[2], z=local_ang_vel[0])
+    ros_ang_vel = Vector3(x=local_ang_vel[0], y=local_ang_vel[1], z=local_ang_vel[2])
 
     pub_ang_vel.publish(ros_ang_vel)
 
@@ -59,7 +56,7 @@ if __name__ == "__main__":
     # pub_global_vel = rospy.Publisher("/state/global_vel", Vector3, queue_size=1)
 
     # REFERENCE FRAME DEFINITIONS
-    q_NWU_imuFrame = np.quaternion(0.707, 0, 0.707, 0)
+    q_NWU_imuFrame = np.quaternion(1, 0, 0, 0)
 
     # subscribers
     rospy.Subscriber("/filter/free_acceleration", Vector3Stamped, accelDataCb)

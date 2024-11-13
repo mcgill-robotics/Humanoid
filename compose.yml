@@ -5,7 +5,7 @@ services:
       - UDEV=on
     image: mcgillrobotics/humanoid:latest
     devices:
-      - "/dev/ttyUSB0:/dev/ttyUSB0"
+      - /dev:/dev
     privileged: true
     build: .
     volumes:
