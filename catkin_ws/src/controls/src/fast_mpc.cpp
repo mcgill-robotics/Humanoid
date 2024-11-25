@@ -33,6 +33,8 @@ std::vector<float> ang_vel = {0.0, 0.0, 0.0};
 geometry_msgs::Quaternion quat;
 std::mutex state_mutex;
 
+bool sent_last = false;
+
 boost::asio::io_context io_context;
 boost::asio::ip::tcp::socket tcp_socket(io_context);
 boost::asio::ip::tcp::resolver resolver(io_context);
@@ -102,8 +104,9 @@ void setupConnection() {
         tcp_socket.non_blocking(true);
         std::cout << "Connected!" << std::endl;
     } catch (const boost::system::system_error& e) {
-        ros::Duration(1.0).sleep();
+        std::cerr << "Error while connecting: " << e.what() << std::endl;
     }
+    ros::Duration(1.0).sleep();
 }
 
 void generateControl(ros::Publisher& command_pub) {
@@ -122,12 +125,28 @@ void generateControl(ros::Publisher& command_pub) {
 
     Json::StreamWriterBuilder writer;
     std::string str_state_json = Json::writeString(writer, state_json);
-
     try {
         boost::asio::write(tcp_socket, boost::asio::buffer(str_state_json));
-        
+        sent_last = true;
+    } catch (const boost::system::system_error& e) {
+        std::cerr << "Error while sending: " << e.what() << std::endl;
+        setupConnection();
+        return;
+    }
+
+    try {
         char reply[1024];
-        size_t reply_length = tcp_socket.read_some(boost::asio::buffer(reply));
+        boost::system::error_code ec;
+        size_t reply_length = tcp_socket.read_some(boost::asio::buffer(reply), ec);
+
+        if (ec == boost::asio::error::would_block) {
+            return;
+        } else if (ec) {
+            std::cerr << "Error while reading from socket: " << ec.message() << std::endl;
+            setupConnection();
+            return;
+        }
+            
         std::string response_str(reply, reply_length);
 
         Json::Reader reader;
@@ -155,7 +174,7 @@ void generateControl(ros::Publisher& command_pub) {
         }
         command_pub.publish(command);
     } catch (const std::exception& e) {
-        ROS_ERROR("Timeout while waiting for MPC server. Reconnecting...");
+        ROS_ERROR_STREAM("Error while sending state to MPC server: " << e.what());
         setupConnection();
     }
 }
@@ -171,18 +190,11 @@ int main(int argc, char** argv) {
 
     double control_interval;
     nh.getParam("/controls/mpc/control_interval", control_interval);
+    ros::Rate rate(control_interval > 0 ? control_interval : 1000.0);
     setupConnection();
-    if (control_interval <= 0) {
-        while (ros::ok()) {
-            generateControl(command_pub);
-        }
-    } else {
-        ros::Rate rate(control_interval > 0 ? 1.0 / control_interval : 100.0);
-        while (ros::ok()) {
-            generateControl(command_pub);
-            rate.sleep();
-        }
+    while (ros::ok()) {
+        generateControl(command_pub);
+        rate.sleep();
     }
-
     return 0;
 }
