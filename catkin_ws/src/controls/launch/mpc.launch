@@ -1,5 +1,8 @@
 <launch>
-    <node pkg="controls" type="mpc.py" name="mpc" respawn="false" output="screen">
+    <!-- <node pkg="controls" type="mpc.py" name="mpc" respawn="false" output="screen">
         <param name="control_interval" value="-1" />
+    </node> -->
+    <param name="/controls/mpc/control_interval" value="-1" />
+    <node pkg="controls" type="fast_mpc" name="fast_mpc" respawn="false" output="screen">
     </node>
 </launch>

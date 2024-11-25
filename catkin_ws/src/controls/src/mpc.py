@@ -57,7 +57,7 @@ if __name__ == "__main__":
     stateGenerator = StateGenerator()
     setupConnection()
 
-    control_interval = float(rospy.get_param("~control_interval"))
+    control_interval = float(rospy.get_param("/controls/mpc/control_interval"))
     if control_interval < 0:
         while not rospy.is_shutdown():
             generateControl(None)
